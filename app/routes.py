@@ -1,7 +1,7 @@
 # routes.py
 from flask import request, jsonify, render_template
 from auth.auth import register_user, login_user
-from services.sensors import generate_test_data
+from services.sensor_generator import generate_test_data
 from datetime import datetime, timedelta
 import sqlite3
 import os

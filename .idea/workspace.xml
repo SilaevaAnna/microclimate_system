@@ -5,17 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6c1af050-2cc7-4826-a5cf-295d1775e607" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/services/sensor_generator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/domain/auth/auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/domain/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/interfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/domain/interfaces.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domain/sensors.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/domain/sensors.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/check_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/check_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/data_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/data_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/notification_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/notification_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/logger.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/database/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/database/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/check_data.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/data_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/data_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/interfaces.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/notification_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/notification_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/sensors.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,18 +57,18 @@
     "Python.__init__.executor": "Run",
     "Python.app.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "dev",
     "last_opened_file_path": "C:/Users/alino/PycharmProjects/microclimate_system/.venv",
     "settings.editor.selected.configurable": "com.intellij.pycharm.community.ide.impl.configuration.PythonContentEntriesConfigurable"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\alino\PycharmProjects\microclimate_system\app\services" />
       <recent name="C:\Users\alino\PycharmProjects\microclimate_system\app" />
+      <recent name="C:\Users\alino\PycharmProjects\microclimate_system\app\database" />
       <recent name="C:\Users\alino\PycharmProjects\microclimate_system\domain" />
       <recent name="C:\Users\alino\PycharmProjects\microclimate_system\services" />
-      <recent name="C:\Users\alino\PycharmProjects\microclimate_system\auth" />
-      <recent name="C:\Users\alino\PycharmProjects\microclimate_system" />
     </key>
   </component>
   <component name="RunManager">

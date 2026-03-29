@@ -13,6 +13,8 @@ class DataBuffer:
     def add_data(self, data):
         """Добавление данных в буфер"""
         with self.lock:
+            if self.buffer.full():
+                self.buffer.get()
             self.buffer.put(data)
 
     def get_data_batch(self, batch_size=10):
@@ -30,48 +32,66 @@ class DataBuffer:
 
 
 from threading import Thread
-from app.services.sensors import generate_test_data
+from app.services.sensor_generator import generate_test_data
 
 
 class DataAcquisitionService:
-    def __init__(self, buffer, update_interval=5):
+    def __init__(self, buffer, data_generator, control_service, notification_service, interval=5):
         self.buffer = buffer
-        self.update_interval = update_interval
+        self.data_generator = data_generator
+        self.control_service = control_service
+        self.notification_service = notification_service
+        self.interval = interval
+        self.running = False
+
+    def start(self):
+        self.running = True
+        Thread(target=self._run, daemon=True).start()
+
+    def _run(self):
+        while self.running:
+            try:
+                data = self.data_generator()
+
+                self.buffer.add_data({
+                    "timestamp": datetime.now().isoformat(),
+                    "data": data
+                })
+
+                self.control_service.process(data)
+                self.notification_service.process(data)
+
+                time.sleep(self.interval)
+
+            except Exception as e:
+                print(f"Ошибка в DataAcquisitionService: {e}")
+
+
+from app.database.database import insert_sensor_readings_batch
+
+
+class DataPersistenceService:
+    def __init__(self, buffer, flush_interval=10):
+        self.buffer = buffer
+        self.flush_interval = flush_interval
         self.running = False
         self.thread = None
 
     def start(self):
-        """Запуск сервиса сбора данных"""
         self.running = True
-        self.thread = Thread(target=self._acquire_data, daemon=True)
+        self.thread = Thread(target=self._flush_loop, daemon=True)
         self.thread.start()
 
-    def _acquire_data(self):
-        """Цикл сбора данных с датчиков"""
+    def _flush_loop(self):
         while self.running:
             try:
-                # Генерация данных с датчиков
-                data = generate_test_data()
+                batch = self.buffer.get_data_batch(20)
 
-                # Добавление данных в буфер
-                self.buffer.add_data({
-                    'timestamp': datetime.now().isoformat(),
-                    'data': data
-                })
+                if batch:
+                    insert_sensor_readings_batch(batch)
+                    print(f"✓ Записано в БД: {len(batch)} записей")
 
-                # Проверка критических значений
-                self._check_critical_values(data)
+                time.sleep(self.flush_interval)
 
-                # Ожидание до следующего цикла
-                time.sleep(self.update_interval)
             except Exception as e:
-                print(f"Ошибка в сервисе сбора данных: {e}")
-
-    def _check_critical_values(self, data):
-        """Проверка критических значений и немедленная реакция"""
-        # Реализация проверки критических значений
-        # и немедленной реакции (без ожидания записи в БД)
-        if data['co2'] > 1500:
-            # Немедленная реакция на критическое значение
-            print("КРИТИЧЕСКОЕ ЗНАЧЕНИЕ СО2! Срочное проветривание!")
-            # Здесь можно вызвать уведомления или другие действия
+                print(f"Ошибка записи в БД: {e}")

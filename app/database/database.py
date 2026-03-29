@@ -73,3 +73,28 @@ def init_db():
     conn.close()
     print("✓ База данных инициализирована")
     print("✓ Тестовый пользователь создан: testuser / password123")
+
+
+def insert_sensor_readings_batch(batch):
+    conn = sqlite3.connect('../../climate_system.db')
+    cursor = conn.cursor()
+
+    cursor.executemany('''
+        INSERT INTO sensor_readings (
+            timestamp, temperature, humidity, co2, voc, pm2_5, pm10
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', [
+        (
+            item['timestamp'],
+            item['data']['temperature'],
+            item['data']['humidity'],
+            item['data']['co2'],
+            item['data']['voc'],
+            item['data']['pm2_5'],
+            item['data']['pm10']
+        )
+        for item in batch
+    ])
+
+    conn.commit()
+    conn.close()

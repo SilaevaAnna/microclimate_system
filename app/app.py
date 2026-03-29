@@ -23,7 +23,8 @@ def create_app():
 
 import threading
 import time
-from app.services.sensors import generate_test_data, check_thresholds_and_notify
+from app.services.sensor_generator import generate_test_data
+from app.services.notification_service import check_thresholds_and_notify
 
 def start_background_thread():
     def background_data_generator():
