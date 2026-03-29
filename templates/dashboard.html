@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система микроклимата - Панель управления</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Стили для красивого интерфейса */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            font-size: 1.8em;
+        }
+
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .sensor-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .sensor-name {
+            font-weight: bold;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .sensor-value {
+            font-size: 1.8em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .sensor-unit {
+            color: #888;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+
+        .sensor-status {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .status-normal {
+            color: #28a745;
+        }
+
+        .status-warning {
+            color: #ffc107;
+        }
+
+        .status-alert {
+            color: #dc3545;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 15px;
+        }
+
+        .actuator-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .actuator-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .actuator-info {
+            flex: 1;
+        }
+
+        .actuator-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .actuator-state {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .state-on {
+            background: #28a745;
+            color: white;
+        }
+
+        .state-off {
+            background: #dc3545;
+            color: white;
+        }
+
+        .actuator-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .notifications-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border-left: 4px solid;
+        }
+
+        .notification-item.warning {
+            border-left-color: #ffc107;
+        }
+
+        .notification-item.alert {
+            border-left-color: #dc3545;
+        }
+
+        .notification-item.info {
+            border-left-color: #17a2b8;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .notification-type {
+            font-weight: bold;
+            font-size: 0.9em;
+            padding: 3px 8px;
+            border-radius: 5px;
+        }
+
+        .notification-message {
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .notification-time {
+            color: #888;
+            font-size: 0.8em;
+        }
+
+        .auth-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .auth-form input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            color: #667eea;
+        }
+
+        .close-modal {
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .device-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .device-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom-color: #667eea;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌡️ Система анализа микроклимата</h1>
+            <p>Умный контроль параметров воздуха в помещении</p>
+            <div id="userInfo" style="margin-top: 10px;"></div>
+        </header>
+
+        <div class="auth-section" id="authSection">
+            <h2>🔐 Авторизация</h2>
+            <div class="auth-form">
+                <input type="text" id="username" placeholder="Имя пользователя" value="testuser">
+                <input type="password" id="password" placeholder="Пароль" value="password123">
+                <button class="btn btn-primary" onclick="login()">Войти</button>
+            </div>
+        </div>
+
+        <div id="mainDashboard" style="display: none;">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('overview')">📊 Обзор</div>
+                <div class="tab" onclick="switchTab('charts')">📈 Графики</div>
+                <div class="tab" onclick="switchTab('devices')">⚙️ Устройства</div>
+                <div class="tab" onclick="switchTab('notifications')">🔔 Уведомления</div>
+                <div class="tab" onclick="switchTab('analytics')">📊 Аналитика</div>
+            </div>
+
+            <!-- Обзор -->
+            <div class="tab-content active" id="overview">
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h2><span class="card-icon">🌡️</span> Текущие показания</h2>
+                        <div class="sensor-grid" id="sensorsData">
+                            <p>Загрузка данных...</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2><span class="card-icon">⚙️</span> Управление устройствами</h2>
+                        <div class="actuator-list" id="actuatorsData">
+                            <p>Загрузка данных...</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2><span class="card-icon">🔔</span> Уведомления</h2>
+                        <div class="notifications-list" id="notificationsData">
+                            <p>Загрузка уведомлений...</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2><span class="card-icon">📊</span> Статистика</h2>
+                        <div class="stats-grid" id="statsData">
+                            <div class="stat-item">
+                                <div class="stat-value" id="avgTemp">--</div>
+                                <div class="stat-label">Средняя темп.</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="avgHum">--</div>
+                                <div class="stat-label">Средняя влажн.</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="avgCO2">--</div>
+                                <div class="stat-label">Средний СО2</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="readingsCount">--</div>
+                                <div class="stat-label">Измерений</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Графики -->
+            <div class="tab-content" id="charts">
+                <div class="card">
+                    <h2>📈 График температуры</h2>
+                    <div class="chart-container">
+                        <canvas id="tempChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>📈 График влажности</h2>
+                    <div class="chart-container">
+                        <canvas id="humidityChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>📈 График СО2</h2>
+                    <div class="chart-container">
+                        <canvas id="co2Chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Устройства -->
+            <div class="tab-content" id="devices">
+                <div class="card">
+                    <h2>🔌 Доступные устройства</h2>
+                    <div id="devicesList">
+                        <p>Загрузка списка устройств...</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="openAddDeviceModal()" style="margin-top: 15px;">
+                        ➕ Добавить устройство
+                    </button>
+                </div>
+            </div>
+
+            <!-- Аналитика -->
+            <div class="tab-content" id="analytics">
+                <div class="card">
+                    <h2>📊 Аналитика за период</h2>
+                    <div class="form-group">
+                        <label for="periodSelect">Выберите период:</label>
+                        <select id="periodSelect" onchange="loadAnalytics()">
+                            <option value="24">Последние 24 часа</option>
+                            <option value="48">Последние 48 часов</option>
+                            <option value="168">Последняя неделя</option>
+                            <option value="720">Последний месяц</option>
+                        </select>
+                    </div>
+                    <div id="analyticsData">
+                        <p>Загрузка аналитики...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно добавления устройства -->
+    <div class="modal" id="addDeviceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Добавить новое устройство</div>
+                <div class="close-modal" onclick="closeAddDeviceModal()">&times;</div>
+            </div>
+            <div class="form-group">
+                <label for="deviceType">Тип устройства:</label>
+                <select id="deviceType" onchange="updateDeviceForm()">
+                    <option value="sensor">Датчик</option>
+                    <option value="actuator">Актуатор</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="deviceName">Название устройства:</label>
+                <input type="text" id="deviceName" placeholder="Например: Датчик температуры 2">
+            </div>
+            <div class="form-group" id="sensorTypeGroup">
+                <label for="sensorType">Тип датчика:</label>
+                <select id="sensorType">
+                    <option value="temperature">Температура</option>
+                    <option value="humidity">Влажность</option>
+                    <option value="co2">CO2</option>
+                    <option value="voc">ЛОС (VOC)</option>
+                    <option value="pm25">PM2.5</option>
+                    <option value="pm10">PM10</option>
+                </select>
+            </div>
+            <div class="form-group" id="actuatorTypeGroup" style="display: none;">
+                <label for="actuatorType">Тип актуатора:</label>
+                <select id="actuatorType">
+                    <option value="relay">Реле</option>
+                    <option value="pwm">ШИМ</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="addDevice()">Добавить устройство</button>
+        </div>
+    </div>
+
+    <script>
+        let authToken = null;
+        let tempChart, humidityChart, co2Chart;
+        let chartData = {
+            timestamps: [],
+            temperatures: [],
+            humidities: [],
+            co2s: []
+        };
+
+        // Функция входа
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    authToken = data.token;
+                    document.getElementById('authSection').style.display = 'none';
+                    document.getElementById('mainDashboard').style.display = 'block';
+                    document.getElementById('userInfo').innerHTML = `
+                        <p>👤 Пользователь: ${username} |
+                        <button class="btn btn-warning" onclick="logout()" style="padding: 5px 10px; font-size: 0.8em;">
+                            Выйти
+                        </button></p>
+                    `;
+                    loadAllData();
+                    startAutoRefresh();
+                } else {
+                    alert('Ошибка входа: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ошибка подключения к серверу');
+            });
+        }
+
+        function logout() {
+            authToken = null;
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('mainDashboard').style.display = 'none';
+            document.getElementById('userInfo').innerHTML = '';
+        }
+
+        // Загрузка данных с датчиков
+        function loadSensors() {
+            fetch('/api/sensors/current')
+            .then(response => response.json())
+            .then(data => {
+                const sensorsDiv = document.getElementById('sensorsData');
+                let html = '';
+
+                for (const [key, sensor] of Object.entries(data.sensors)) {
+                    const statusClass = getStatusClass(key, sensor.value);
+                    const statusText = getStatusText(key, sensor.value);
+
+                    html += `
+                        <div class="sensor-item">
+                            <div class="sensor-name">${getSensorName(key)}</div>
+                            <div>
+                                <span class="sensor-value">${sensor.value}</span>
+                                <span class="sensor-unit">${sensor.unit}</span>
+                            </div>
+                            <div class="sensor-status ${statusClass}">${statusText}</div>
+                        </div>
+                    `;
+                }
+
+                sensorsDiv.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Загрузка статуса актуаторов
+        function loadActuators() {
+            fetch('/api/actuators/status')
+            .then(response => response.json())
+            .then(data => {
+                const actuatorsDiv = document.getElementById('actuatorsData');
+                let html = '';
+
+                for (const [name, device] of Object.entries(data.actuators)) {
+                    const stateClass = device.state === 'on' ? 'state-on' : 'state-off';
+                    const stateText = device.state === 'on' ? 'Включён' : 'Выключен';
+
+                    html += `
+                        <div class="actuator-item">
+                            <div class="actuator-info">
+                                <div class="actuator-name">${getDeviceName(name)}</div>
+                                <div class="actuator-type">${device.type}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="actuator-state ${stateClass}">${stateText}</div>
+                                <div class="actuator-controls">
+                                    <button class="btn btn-${device.state === 'on' ? 'danger' : 'success'}"
+                                            onclick="controlDevice('${name}', '${device.state === 'on' ? 'turn_off' : 'turn_on'}')">
+                                        ${device.state === 'on' ? 'Выключить' : 'Включить'}
+                                    </button>
+                                    <button class="btn btn-warning"
+                                            onclick="ignoreDevice('${name}')">
+                                        Игнорировать
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                actuatorsDiv.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Загрузка уведомлений
+        function loadNotifications() {
+            if (!authToken) return;
+
+            fetch('/api/notifications', {
+                headers: {
+                    'Authorization': 'Bearer ' + authToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const notificationsDiv = document.getElementById('notificationsData');
+                let html = '';
+
+                if (data.notifications && data.notifications.length > 0) {
+                    data.notifications.slice(0, 10).forEach(notif => {
+                        html += `
+                            <div class="notification-item ${notif.type}">
+                                <div class="notification-header">
+                                    <span class="notification-type">${notif.type.toUpperCase()}</span>
+                                    <span class="notification-time">${new Date(notif.timestamp).toLocaleTimeString()}</span>
+                                </div>
+                                <div class="notification-message">${notif.message}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html = '<p>Нет новых уведомлений</p>';
+                }
+
+                notificationsDiv.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Загрузка статистики
+        function loadStatistics() {
+            fetch('/api/sensors/statistics?hours=24')
+            .then(response => response.json())
+            .then(data => {
+                if (data.temperature) {
+                    document.getElementById('avgTemp').textContent = data.temperature.avg + '°C';
+                    document.getElementById('avgHum').textContent = data.humidity.avg + '%';
+                    document.getElementById('avgCO2').textContent = data.co2.avg;
+                    document.getElementById('readingsCount').textContent = data.readings_count;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Загрузка графиков
+        function loadCharts() {
+            fetch('/api/sensors/history?hours=24')
+            .then(response => response.json())
+            .then(data => {
+                if (data.data && data.data.length > 0) {
+                    chartData.timestamps = data.data.map(d => new Date(d.timestamp));
+                    chartData.temperatures = data.data.map(d => d.temperature);
+                    chartData.humidities = data.data.map(d => d.humidity);
+                    chartData.co2s = data.data.map(d => d.co2);
+
+                    updateCharts();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function updateCharts() {
+            if (!tempChart) {
+                const tempCtx = document.getElementById('tempChart').getContext('2d');
+                tempChart = new Chart(tempCtx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.timestamps,
+                        datasets: [{
+                            label: 'Температура (°C)',
+                            data: chartData.temperatures,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+
+                const humidityCtx = document.getElementById('humidityChart').getContext('2d');
+                humidityChart = new Chart(humidityCtx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.timestamps,
+                        datasets: [{
+                            label: 'Влажность (%)',
+                            data: chartData.humidities,
+                            borderColor: '#764ba2',
+                            backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+
+                const co2Ctx = document.getElementById('co2Chart').getContext('2d');
+                co2Chart = new Chart(co2Ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.timestamps,
+                        datasets: [{
+                            label: 'CO2 (ppm)',
+                            data: chartData.co2s,
+                            borderColor: '#f093fb',
+                            backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            } else {
+                tempChart.data.labels = chartData.timestamps;
+                tempChart.data.datasets[0].data = chartData.temperatures;
+                tempChart.update();
+
+                humidityChart.data.labels = chartData.timestamps;
+                humidityChart.data.datasets[0].data = chartData.humidities;
+                humidityChart.update();
+
+                co2Chart.data.labels = chartData.timestamps;
+                co2Chart.data.datasets[0].data = chartData.co2s;
+                co2Chart.update();
+            }
+        }
+
+        // Управление устройством
+        function controlDevice(deviceName, action) {
+            if (!authToken) {
+                alert('Сначала войдите в систему!');
+                return;
+            }
+
+            fetch('/api/actuators/control', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + authToken
+                },
+                body: JSON.stringify({ device: deviceName, action: action })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadActuators();
+                    alert(data.message || 'Устройство успешно изменено');
+                } else {
+                    alert('Ошибка: ' + (data.message || JSON.stringify(data)));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ошибка управления устройством: ' + error.message);
+            });
+        }
+
+        // Игнорирование устройства
+        function ignoreDevice(deviceName) {
+            if (confirm(`Вы уверены, что хотите игнорировать устройство "${getDeviceName(deviceName)}"?`)) {
+                alert('Функция игнорирования устройства будет реализована в будущем');
+            }
+        }
+
+        // Загрузка списка устройств
+        function loadDevicesList() {
+            fetch('/api/devices/list')
+            .then(response => response.json())
+            .then(data => {
+                const devicesDiv = document.getElementById('devicesList');
+                let html = '';
+
+                if (data.devices && data.devices.length > 0) {
+                    data.devices.forEach(device => {
+                        html += `
+                            <div class="device-item">
+                                <div>
+                                    <strong>${device.name}</strong><br>
+                                    <small>Тип: ${device.type} | ID: ${device.id}</small>
+                                </div>
+                                <div class="device-controls">
+                                    ${device.type === 'actuator' ? `
+                                        <button class="btn btn-${device.state === 'on' ? 'danger' : 'success'}"
+                                                onclick="controlDevice('${device.name}', '${device.state === 'on' ? 'turn_off' : 'turn_on'}')">
+                                            ${device.state === 'on' ? 'Выключить' : 'Включить'}
+                                        </button>
+                                    ` : ''}
+                                    <button class="btn btn-warning" onclick="removeDevice('${device.id}')">Удалить</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html = '<p>Нет подключенных устройств</p>';
+                }
+
+                devicesDiv.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Загрузка аналитики
+        function loadAnalytics() {
+            const hours = document.getElementById('periodSelect').value;
+
+            fetch(`/api/sensors/statistics?hours=${hours}`)
+            .then(response => response.json())
+            .then(data => {
+                const analyticsDiv = document.getElementById('analyticsData');
+                let html = '';
+
+                if (Object.keys(data).length > 0) {
+                    html = `
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                            <div class="stat-item">
+                                <div class="stat-value">${data.temperature.avg}°C</div>
+                                <div class="stat-label">Средняя температура</div>
+                                <small>Мин: ${data.temperature.min}°C | Макс: ${data.temperature.max}°C</small>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${data.humidity.avg}%</div>
+                                <div class="stat-label">Средняя влажность</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${data.co2.avg} ppm</div>
+                                <div class="stat-label">Средний СО2</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${data.readings_count}</div>
+                                <div class="stat-label">Всего измерений</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html = '<p>Нет данных за выбранный период</p>';
+                }
+
+                analyticsDiv.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Переключение вкладок
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            // Загрузка данных для вкладки при первом открытии
+            if (tabName === 'charts') {
+                loadCharts();
+            } else if (tabName === 'devices') {
+                loadDevicesList();
+            } else if (tabName === 'analytics') {
+                loadAnalytics();
+            }
+        }
+
+        // Открытие модального окна добавления устройства
+        function openAddDeviceModal() {
+            document.getElementById('addDeviceModal').style.display = 'flex';
+        }
+
+        function closeAddDeviceModal() {
+            document.getElementById('addDeviceModal').style.display = 'none';
+        }
+
+        function updateDeviceForm() {
+            const deviceType = document.getElementById('deviceType').value;
+            document.getElementById('sensorTypeGroup').style.display = deviceType === 'sensor' ? 'block' : 'none';
+            document.getElementById('actuatorTypeGroup').style.display = deviceType === 'actuator' ? 'block' : 'none';
+        }
+
+        function addDevice() {
+            const deviceType = document.getElementById('deviceType').value;
+            const deviceName = document.getElementById('deviceName').value;
+
+            if (!deviceName) {
+                alert('Введите название устройства');
+                return;
+            }
+
+            let deviceData = {
+                type: deviceType,
+                name: deviceName
+            };
+
+            if (deviceType === 'sensor') {
+                deviceData.sensor_type = document.getElementById('sensorType').value;
+            } else {
+                deviceData.actuator_type = document.getElementById('actuatorType').value;
+            }
+
+            fetch('/api/devices/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + authToken
+                },
+                body: JSON.stringify(deviceData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Устройство успешно добавлено');
+                    closeAddDeviceModal();
+                    loadDevicesList();
+                } else {
+                    alert('Ошибка: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ошибка добавления устройства');
+            });
+        }
+
+        // Загрузка всех данных
+        function loadAllData() {
+            loadSensors();
+            loadActuators();
+            loadNotifications();
+            loadStatistics();
+        }
+
+        // Автообновление каждые 5 секунд
+        function startAutoRefresh() {
+            setInterval(() => {
+                loadSensors();
+                loadActuators();
+                loadNotifications();
+            }, 5000);
+        }
+
+        // Вспомогательные функции
+        function getSensorName(key) {
+            const names = {
+                'temperature': '🌡️ Температура',
+                'humidity': '💧 Влажность',
+                'co2': '💨 CO₂',
+                'voc': '🔬 ЛОС (VOC)',
+                'pm2_5': '🌫️ PM2.5',
+                'pm10': '🌫️ PM10'
+            };
+            return names[key] || key;
+        }
+
+        function getDeviceName(name) {
+            const names = {
+                'humidifier': '💧 Увлажнитель',
+                'fan': '🌀 Вентилятор',
+                'heater': '🔥 Обогреватель'
+            };
+            return names[name] || name;
+        }
+
+        function getStatusClass(sensorType, value) {
+            switch(sensorType) {
+                case 'temperature':
+                    if (value < 18 || value > 26) return 'status-warning';
+                    if (value < 10 || value > 30) return 'status-alert';
+                    return 'status-normal';
+                case 'humidity':
+                    if (value < 30 || value > 60) return 'status-warning';
+                    if (value < 20 || value > 70) return 'status-alert';
+                    return 'status-normal';
+                case 'co2':
+                    if (value > 800) return 'status-warning';
+                    if (value > 1000) return 'status-alert';
+                    return 'status-normal';
+                default:
+                    return 'status-normal';
+            }
+        }
+
+        function getStatusText(sensorType, value) {
+            const status = getStatusClass(sensorType, value);
+            if (status === 'status-normal') return '✅ В норме';
+            if (status === 'status-warning') return '⚠️ Предупреждение';
+            return '❌ Критично';
+        }
+
+        // Закрытие модального окна при клике вне его
+        window.onclick = function(event) {
+            const modal = document.getElementById('addDeviceModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
