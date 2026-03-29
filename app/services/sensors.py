@@ -138,7 +138,7 @@ def print_devices_info():
 
 def save_sensor_reading(temperature, humidity, co2, voc, pm2_5, pm10):
     """Сохранение показаний датчиков в базу данных"""
-    conn = sqlite3.connect('../climate_system.db')
+    conn = sqlite3.connect('../../climate_system.db')
     cursor = conn.cursor()
 
     cursor.execute('''
@@ -197,7 +197,7 @@ def automatic_control_based_on_sensors(temp, humidity, co2):
     """
     actions = []
 
-    conn = sqlite3.connect('../climate_system.db')
+    conn = sqlite3.connect('../../climate_system.db')
     cursor = conn.cursor()
 
     # Проверка температуры
@@ -244,7 +244,7 @@ def automatic_control_based_on_sensors(temp, humidity, co2):
 
 def check_thresholds_and_notify():
     """Проверка пороговых значений и создание уведомлений"""
-    conn = sqlite3.connect('../climate_system.db')
+    conn = sqlite3.connect('../../climate_system.db')
     cursor = conn.cursor()
 
     # Получаем последнее измерение

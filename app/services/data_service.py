@@ -29,9 +29,8 @@ class DataBuffer:
             return self.buffer.empty()
 
 
-# data_service.py
 from threading import Thread
-from domain.sensors import generate_test_data
+from app.services.sensors import generate_test_data
 
 
 class DataAcquisitionService:

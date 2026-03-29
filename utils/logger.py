@@ -4,7 +4,7 @@ from datetime import datetime
 import os
 import threading
 import time
-from domain.sensors import generate_test_data
+from app import generate_test_data
 
 def setup_logger():
     """Настройка логгера"""

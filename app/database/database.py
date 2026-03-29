@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash
 
 
 def init_db():
-    conn = sqlite3.connect('../climate_system.db')
+    conn = sqlite3.connect('../../climate_system.db')
     cursor = conn.cursor()
 
     # Таблица пользователей

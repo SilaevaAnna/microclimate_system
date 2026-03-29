@@ -1,6 +1,6 @@
 import sqlite3
 
-conn = sqlite3.connect('../climate_system.db')
+conn = sqlite3.connect('../../climate_system.db')
 cursor = conn.cursor()
 
 # Проверка количества записей

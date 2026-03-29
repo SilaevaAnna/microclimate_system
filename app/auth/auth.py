@@ -4,7 +4,7 @@ import sqlite3
 
 
 def register_user(username, password, email):
-    conn = sqlite3.connect('../climate_system.db')
+    conn = sqlite3.connect('../../climate_system.db')
     cursor = conn.cursor()
 
     try:
@@ -22,7 +22,7 @@ def register_user(username, password, email):
 
 
 def login_user(username, password):
-    conn = sqlite3.connect('../climate_system.db')
+    conn = sqlite3.connect('../../climate_system.db')
     cursor = conn.cursor()
 
     cursor.execute("SELECT id, password FROM users WHERE username = ?", (username,))
