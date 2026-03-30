@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6c1af050-2cc7-4826-a5cf-295d1775e607" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/services/sensor_generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/database/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/database/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/check_data.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/data_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/data_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/interfaces.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/notification_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/notification_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/sensors.py" beforeDir="false" />
-    </list>
+    <list default="true" id="6c1af050-2cc7-4826-a5cf-295d1775e607" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
