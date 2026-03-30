@@ -19,9 +19,9 @@ def automatic_control_based_on_sensors(temp, humidity, co2):
 
     # Проверка температуры
     if temp < 18:
-        actions.append(('heater', 'turn_on', f'Температура низкая: {temp}°C'))
+        actions.append(('heater', 'turn_on', f'Температура низкая: {temp}C'))
     elif temp > 26:
-        actions.append(('fan', 'turn_on', f'Температура высокая: {temp}°C'))
+        actions.append(('fan', 'turn_on', f'Температура высокая: {temp}C'))
     else:
         actions.append(('heater', 'turn_off', ''))
         actions.append(('fan', 'turn_off', ''))
@@ -34,9 +34,9 @@ def automatic_control_based_on_sensors(temp, humidity, co2):
     else:
         actions.append(('humidifier', 'turn_off', ''))
 
-    # Проверка СО2
+    # Проверка CO2
     if co2 > 1000:
-        actions.append(('fan', 'turn_on', f'СО2 критический: {co2} ppm'))
+        actions.append(('fan', 'turn_on', f'CO2 критический: {co2} ppm'))
 
     # Применение действий
     for device_name, action, reason in actions:
@@ -46,7 +46,7 @@ def automatic_control_based_on_sensors(temp, humidity, co2):
                 (device_name,)
             )
             if reason:
-                print(f"  ⚙️  {device_name.upper()}: ВКЛЮЧЁН ({reason})")
+                print(f"  {device_name.upper()}: ВКЛЮЧЕН ({reason})")
         elif action == 'turn_off':
             cursor.execute(
                 "UPDATE actuators SET state = 'off', updated_at = CURRENT_TIMESTAMP WHERE name = ?",

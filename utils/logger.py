@@ -4,7 +4,7 @@ from datetime import datetime
 import os
 import threading
 import time
-from app import generate_test_data
+
 
 def setup_logger():
     """Настройка логгера"""
@@ -52,6 +52,8 @@ class DataAcquisitionService:
 
     def _acquire_data(self):
         """Цикл сбора данных с датчиков"""
+        from app.services.sensor_generator import generate_test_data
+        
         while self.running:
             try:
                 # Генерация данных с датчиков
@@ -67,7 +69,7 @@ class DataAcquisitionService:
                 self._check_critical_values(data)
 
                 # Логирование собранных данных
-                self.logger.info(f"Собраны данные: {data}")  # Исправлено: переменная data теперь определена
+                self.logger.info(f"Собраны данные: {data}")
 
                 # Ожидание до следующего цикла
                 time.sleep(self.update_interval)

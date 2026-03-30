@@ -71,8 +71,8 @@ def init_db():
 
     conn.commit()
     conn.close()
-    print("✓ База данных инициализирована")
-    print("✓ Тестовый пользователь создан: testuser / password123")
+    print("Database initialized")
+    print("Test user created: testuser / password123")
 
 
 def insert_sensor_readings_batch(batch):

@@ -21,9 +21,9 @@ def check_thresholds_and_notify():
 
         # Проверка температуры
         if temp < 18:
-            notifications.append(("warning", f"Низкая температура: {temp}°C (норма: 18-24°С)"))
+            notifications.append(("warning", f"Низкая температура: {temp}C (норма: 18-24C)"))
         elif temp > 26:
-            notifications.append(("warning", f"Высокая температура: {temp}°C (норма: 18-24°С)"))
+            notifications.append(("warning", f"Высокая температура: {temp}C (норма: 18-24C)"))
 
         # Проверка влажности
         if humidity < 30:
@@ -31,11 +31,11 @@ def check_thresholds_and_notify():
         elif humidity > 60:
             notifications.append(("warning", f"Высокая влажность: {humidity}% (норма: 30-60%)"))
 
-        # Проверка СО2
+        # Проверка CO2
         if co2 > 1000:
-            notifications.append(("alert", f"КРИТИЧЕСКИЙ уровень СО2: {co2} ppm (норма: 600-800 ppm)"))
+            notifications.append(("alert", f"КРИТИЧЕСКИЙ уровень CO2: {co2} ppm (норма: 600-800 ppm)"))
         elif co2 > 800:
-            notifications.append(("warning", f"Повышенный уровень СО2: {co2} ppm (норма: 600-800 ppm)"))
+            notifications.append(("warning", f"Повышенный уровень CO2: {co2} ppm (норма: 600-800 ppm)"))
 
         # Проверка ЛОС (VOC)
         if voc > 500:
@@ -45,15 +45,15 @@ def check_thresholds_and_notify():
 
         # Проверка пыли PM2.5
         if pm2_5 > 35:
-            notifications.append(("alert", f"Высокий уровень пыли PM2.5: {pm2_5} µg/m³ (норма: 0-15 µg/m³)"))
+            notifications.append(("alert", f"Высокий уровень пыли PM2.5: {pm2_5} ug/m3 (норма: 0-15 ug/m3)"))
         elif pm2_5 > 15:
-            notifications.append(("warning", f"Повышенный уровень пыли PM2.5: {pm2_5} µg/m³"))
+            notifications.append(("warning", f"Повышенный уровень пыли PM2.5: {pm2_5} ug/m3"))
 
         # Проверка пыли PM10
         if pm10 > 50:
-            notifications.append(("alert", f"Высокий уровень пыли PM10: {pm10} µg/m³ (норма: 0-25 µg/m³)"))
+            notifications.append(("alert", f"Высокий уровень пыли PM10: {pm10} ug/m3 (норма: 0-25 ug/m3)"))
         elif pm10 > 25:
-            notifications.append(("warning", f"Повышенный уровень пыли PM10: {pm10} µg/m³"))
+            notifications.append(("warning", f"Повышенный уровень пыли PM10: {pm10} ug/m3"))
 
         # Сохранение уведомлений
         if notifications:
@@ -78,7 +78,7 @@ class CriticalValueHandler:
     def handle_critical_value(self, value_type, value, threshold):
         """Обработка критического значения"""
         message = f"КРИТИЧЕСКОЕ ЗНАЧЕНИЕ: {value_type} = {value} (порог: {threshold})"
-        print(f"⚠️ {message}")
+        print(f"WARNING: {message}")
 
         # Создание уведомления
         self.notification_service.create_notification(
@@ -94,6 +94,6 @@ class CriticalValueHandler:
         """Немедленная реакция на критическое значение"""
         if value_type == "co2" and value > 1500:
             # Включаем вентилятор для немедленного проветривания
-            from actuator_service import ActuatorService
+            from app.services.actuator_service import ActuatorService
             actuator_service = ActuatorService()
             actuator_service.control_device("fan", "turn_on")
