@@ -759,7 +759,8 @@
 
         // Загрузка графиков
         function loadCharts() {
-            fetch('/api/sensors/history?hours=24')
+            // Try to get data from last 48 hours first, fallback to longer period
+            fetch('/api/sensors/history?hours=48')
             .then(response => response.json())
             .then(data => {
                 if (data.data && data.data.length > 0) {
@@ -767,8 +768,22 @@
                     chartData.temperatures = data.data.map(d => d.temperature);
                     chartData.humidities = data.data.map(d => d.humidity);
                     chartData.co2s = data.data.map(d => d.co2);
-
                     updateCharts();
+                } else {
+                    // If no data in 48 hours, try 7 days
+                    return fetch('/api/sensors/history?hours=168');
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.data && data.data.length > 0) {
+                    chartData.timestamps = data.data.map(d => new Date(d.timestamp));
+                    chartData.temperatures = data.data.map(d => d.temperature);
+                    chartData.humidities = data.data.map(d => d.humidity);
+                    chartData.co2s = data.data.map(d => d.co2);
+                    updateCharts();
+                } else {
+                    console.log('No data available for charts');
                 }
             })
             .catch(error => {
